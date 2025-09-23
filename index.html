@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تحدي التراث السعودي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background: url('photo-1590959914819-b767b9fe4cfb.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .correct { background-color: #16a34a !important; } /* أخضر */
+    .wrong { background-color: #dc2626 !important; }   /* أحمر */
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-white bg-black/70">
+
+  <div id="app" class="max-w-3xl w-full bg-gray-800/90 rounded-2xl shadow-lg p-8"></div>
+
+  <!-- الأصوات -->
+  <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+  <audio id="warningSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+  <script>
+    const questions = [
+      { 
+        q: "ما اسم الرقصة التقليدية المشهورة في السعودية والتي تُؤدى بالسيوف؟",
+        options: ["الرقص البلدي","العرضة","الدبكة","السامري"],
+        answer: 1,
+        img: "العارضه.jpg"
+      },
+      { 
+        q: "ما هي الأكلة السعودية التقليدية التي تضم الأرز واللحم وتُطهى في قدر كبير؟",
+        options: ["الكبسة","المندي","المظبي","الجريش"],
+        answer: 0,
+        img: "وصفة-كبسة-سعودية.jpg"
+      },
+      { 
+        q: "ما اسم اللباس التقليدي الذي يرتديه الرجال في السعودية؟",
+        options: ["الثوب","الدشداشة","الجلابية","العباءة"],
+        answer: 0,
+        img: "eQiH9OQAyBbg7k8aSjnRvQcUo78RrIv1yLcB5B6R.jpg"
+      },
+      { 
+        q: "أي مدينة تُعرف بكونها مركز تجارة اللبان في التاريخ؟",
+        options: ["الرياض","جدة","عين الذيبة","الدمام"],
+        answer: 2,
+        img: "676191.jpeg"
+      },
+      { 
+        q: "ما اسم المشروب التقليدي المحضَّر من القهوة العربية مع الهيل؟",
+        options: ["الشاي","القهوة العربية","التمر الهندي","الزعفران"],
+        answer: 1,
+        img: "فوائد-القهوة-العربي-وطريقة-تحضيرها.jpg"
+      },
+      { 
+        q: "ما اسم الوجبة الشعبية التي تُحضر من القمح المجروش؟",
+        options: ["الجريش","الكبسة","المندي","المظبي"],
+        answer: 0,
+        img: "ما_هو_الجريش.jpg"
+      },
+      { 
+        q: "ما اسم البيت التقليدي في نجد المبني من الطين؟",
+        options: ["بيت الشعر","البيت النجدي","بيت الطين","بيت الحجر"],
+        answer: 2,
+        img: "Cover-2025-02-11T121608.299.jpg"
+      },
+      { 
+        q: "ما اسم الآلة الموسيقية التقليدية المستخدمة في الفلكلور السعودي؟",
+        options: ["الربابة","العود","الكمان","الطبل"],
+        answer: 0,
+        img: "images.jpg"
+      },
+      { 
+        q: "ما اسم الخبز التقليدي المشهور في السعودية؟",
+        options: ["خبز التميس","خبز الشراك","خبز الصاج","خبز التنور"],
+        answer: 0,
+        img: "maxresdefault.jpg"
+      },
+      { 
+        q: "أي منطقة سعودية تشتهر بمدائن صالح الأثرية؟",
+        options: ["العلا","الرياض","نجران","جازان"],
+        answer: 0,
+        img: "waaaaaa.jpeg"
+      },
+      { 
+        q: "ما اسم النقوش الصخرية القديمة في السعودية؟",
+        options: ["النقوش النبطية","النقوش الثمودية","النقوش الهيروغليفية","النقوش الفينيقية"],
+        answer: 1,
+        img: "1590461-731880183.jpg"
+      },
+      { 
+        q: "ما اسم الزي التقليدي الذي ترتديه النساء في جنوب السعودية؟",
+        options: ["العباءة","المزراعة","الثوب الجنوبي","الجلابية"],
+        answer: 2,
+        img: "b0b355e5-d8ad-4c6b-a5b8-fb2e47156531-803.6253776435x1000-d2UKavTboPWa457rqZ8lygrtZgrrbDChjY8VU762.jpg"
+      },
+      { 
+        q: "ما اسم المهرجان المشهور في الجنادرية؟",
+        options: ["مهرجان الجنادرية","مهرجان التراث","مهرجان الرياض","مهرجان الحجاز"],
+        answer: 0,
+        img: "f151415095702.jpg"
+      },
+      { 
+        q: "أي منطقة تشتهر بمنتج البن العربي في السعودية؟",
+        options: ["جازان","تبوك","الدمام","مكة"],
+        answer: 0,
+        img: "U0HXqtPHXKeZMhILn2jwwFEYbFkidcvRes2z5dLJ.jpg"
+      },
+      { 
+        q: "ما اسم الشجرة المشهورة التي يُستخرج منها اللبان؟",
+        options: ["شجرة اللبان","شجرة الزيتون","شجرة العرعر","شجرة السدر"],
+        answer: 0,
+        img: "886e7e96-b04d-4b81-b2a4-9f21bf8227b0-1000x614-MmMrlalThFxrhvtwmqiJAnCE0crK5fkbliHI2kQf.jpg"
+      }
+    ];
+
+    let index = 0, score = 0, timer, timeLeft = 10;
+    const app = document.getElementById("app");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const warningSound = document.getElementById("warningSound");
+
+    function render() {
+      if (index >= questions.length) {
+        showResult();
+        return;
+      }
+
+      timeLeft = 10;
+      clearInterval(timer);
+
+      const q = questions[index];
+      app.innerHTML = `
+        <header class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold">اختبار التراث السعودي</h1>
+            <p class="text-sm text-gray-400 mt-1">عدد الأسئلة: ${questions.length}</p>
+          </div>
+          <div class="text-sm text-gray-400">السؤال ${index + 1} / ${questions.length}</div>
+        </header>
+
+        <main>
+          <img src="${q.img}" alt="صورة السؤال" class="w-full h-52 object-cover rounded-lg mb-4 shadow" />
+          <h2 class="text-lg font-semibold mb-4">${q.q}</h2>
+          <div id="options" class="grid gap-3">
+            ${q.options.map((opt, i) => `
+              <button id="opt-${i}" onclick="choose(${i})"
+                class="p-3 rounded-lg border cursor-pointer text-right bg-gray-700 hover:bg-gray-600 transition">
+                <div class="flex items-center justify-between">
+                  <span class="font-medium">${opt}</span>
+                  <span class="text-xs text-gray-400">${String.fromCharCode(65 + i)}</span>
+                </div>
+              </button>
+            `).join("")}
+          </div>
+          <div class="mt-4 text-center">
+            <p class="text-lg">الوقت المتبقي: <span id="timer" class="font-bold">${timeLeft}</span> ثانية</p>
+          </div>
+        </main>
+      `;
+
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = timeLeft;
+
+        if (timeLeft <= 3 && timeLeft > 0) {
+          warningSound.play();
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          choose(-1); // لو الوقت خلص من غير إجابة
+        }
+      }, 1000);
+    }
+
+    function choose(i) {
+      clearInterval(timer);
+
+      const correct = questions[index].answer;
+      const options = document.querySelectorAll("#options button");
+
+      options.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === correct) btn.classList.add("correct");
+        if (idx === i && i !== correct) btn.classList.add("wrong");
+      });
+
+      if (i === correct) {
+        score++;
+        correctSound.play();
+      } else if (i !== -1) {
+        wrongSound.play();
+      }
+
+      setTimeout(() => {
+        index++;
+        render();
+      }, 1500);
+    }
+
+    function showResult() {
+      app.innerHTML = `
+        <div class="text-center py-8">
+          <h2 class="text-3xl font-bold mb-6">النتيجة</h2>
+          <canvas id="resultChart" width="200" height="200"></canvas>
+          <p class="text-xl mt-4">درجتك: <span class="font-semibold">${score}</span> من <span class="font-semibold">${questions.length}</span></p>
+          <div class="mt-6 flex items-center justify-center gap-3">
+            <button onclick="restart()" class="px-5 py-2 rounded-lg bg-pink-600 hover:bg-pink-700">إعادة</button>
+            <button onclick="goHome()" class="px-5 py-2 rounded-lg border border-pink-600">الصفحة الرئيسية</button>
+          </div>
+        </div>
+      `;
+
+      const ctx = document.getElementById('resultChart').getContext('2d');
+      const percent = Math.round((score / questions.length) * 100);
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [percent, 100 - percent],
+            backgroundColor: ['#ec4899', '#374151'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          cutout: '80%',
+          plugins: {
+            tooltip: { enabled: false },
+            legend: { display: false },
+            title: {
+              display: true,
+              text: percent + '%',
+              color: '#fff',
+              font: { size: 24 }
+            }
+          }
+        }
+      });
+    }
+
+    function restart() {
+      index = 0; score = 0;
+      render();
+    }
+
+    function goHome() {
+      alert("هنا ممكن تربطه بصفحة رئيسية لو عندك.");
+    }
+
+    render();
+  </script>
+</body>
+</html>
